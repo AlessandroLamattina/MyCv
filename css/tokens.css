@@ -1,0 +1,142 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   Design tokens — palette, superfici, tipografia, spaziature
+   Tema chiaro di default; il tema scuro è definito due volte:
+   - @media (prefers-color-scheme: dark) per chi non ha scelto nulla
+   - :root[data-theme="dark"] per la scelta esplicita dal toggle
+   ========================================================================== */
+
+:root {
+  /* Colori di base */
+  --bg: #f5f5f7;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #ebebef;
+  --text: #1d1d1f;
+  --text-secondary: #4b4b50;
+  --text-muted: #6e6e73;
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgba(0, 113, 227, 0.1);
+  --hairline: rgba(0, 0, 0, 0.1);
+
+  /* Superfici in vetro */
+  --glass-bg: rgba(255, 255, 255, 0.66);
+  --glass-bg-strong: rgba(255, 255, 255, 0.86);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-blur: 20px;
+
+  /* Sfondo decorativo dell'hero (fallback senza WebGL) */
+  --aurora-1: rgba(0, 113, 227, 0.35);
+  --aurora-2: rgba(120, 80, 220, 0.25);
+  --aurora-3: rgba(0, 200, 190, 0.22);
+
+  /* Ombre */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08), 0 24px 64px rgba(0, 0, 0, 0.1);
+
+  /* Raggi */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-pill: 980px;
+
+  /* Tipografia */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.25rem + 1.1vw, 2rem);
+  --text-3xl: clamp(1.875rem, 1.4rem + 2vw, 2.75rem);
+  --text-hero: clamp(2.5rem, 1.4rem + 5.2vw, 5rem);
+
+  /* Spaziature */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Layout */
+  --container: 1120px;
+  --nav-height: 52px;
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration: 0.4s;
+
+  color-scheme: light;
+}
+
+/* Tema scuro — preferenza di sistema, se l'utente non ha scelto "light" */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000;
+    --bg-elevated: #1c1c1e;
+    --bg-subtle: #16161a;
+    --text: #f5f5f7;
+    --text-secondary: #c7c7cc;
+    --text-muted: #98989d;
+    --accent: #2997ff;
+    --accent-hover: #47a6ff;
+    --accent-contrast: #001225;
+    --accent-soft: rgba(41, 151, 255, 0.16);
+    --hairline: rgba(255, 255, 255, 0.14);
+
+    --glass-bg: rgba(28, 28, 30, 0.62);
+    --glass-bg-strong: rgba(20, 20, 22, 0.84);
+    --glass-border: rgba(255, 255, 255, 0.1);
+
+    --aurora-1: rgba(41, 151, 255, 0.35);
+    --aurora-2: rgba(140, 90, 255, 0.28);
+    --aurora-3: rgba(0, 210, 190, 0.2);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.45);
+
+    color-scheme: dark;
+  }
+}
+
+/* Tema scuro — scelta esplicita dal toggle (vince sempre) */
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --bg-elevated: #1c1c1e;
+  --bg-subtle: #16161a;
+  --text: #f5f5f7;
+  --text-secondary: #c7c7cc;
+  --text-muted: #98989d;
+  --accent: #2997ff;
+  --accent-hover: #47a6ff;
+  --accent-contrast: #001225;
+  --accent-soft: rgba(41, 151, 255, 0.16);
+  --hairline: rgba(255, 255, 255, 0.14);
+
+  --glass-bg: rgba(28, 28, 30, 0.62);
+  --glass-bg-strong: rgba(20, 20, 22, 0.84);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  --aurora-1: rgba(41, 151, 255, 0.35);
+  --aurora-2: rgba(140, 90, 255, 0.28);
+  --aurora-3: rgba(0, 210, 190, 0.2);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.45);
+
+  color-scheme: dark;
+}
