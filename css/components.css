@@ -9,6 +9,9 @@
   top: var(--space-5);
   left: var(--space-5);
   z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 500;
@@ -16,29 +19,19 @@
   text-decoration: none;
   color: var(--text);
   background: var(--bg);
-  padding: 0.35rem 0.6rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.4rem;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-sm);
 }
-.brand-mark::before {
-  content: "AL";
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.4em;
-  height: 1.4em;
-  margin-right: 0.5em;
-  background: var(--accent);
-  color: var(--accent-contrast);
-  font-size: 0.85em;
-  font-weight: 700;
-  border-radius: calc(var(--radius-sm) - 4px);
-  vertical-align: middle;
+.brand-mark__logo {
+  display: block;
+  height: 1.7em;
+  width: auto;
 }
 
 @media (max-width: 600px) {
   .brand-mark span { display: none; }
-  .brand-mark::before { margin-right: 0; }
+  .brand-mark { padding: 0.3rem 0.45rem; }
 }
 
 /* ==========================================================================

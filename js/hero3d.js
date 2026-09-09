@@ -34,7 +34,7 @@
 
   function getAccentColor() {
     const styles = getComputedStyle(document.documentElement);
-    return styles.getPropertyValue("--accent").trim() || "#e1421c";
+    return styles.getPropertyValue("--accent").trim() || "#066499";
   }
 
   function init() {
