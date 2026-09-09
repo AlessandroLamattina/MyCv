@@ -708,6 +708,7 @@ body.menu-open .back-to-top {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-4);
+  padding: var(--space-6);
   text-decoration: none;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-lg);

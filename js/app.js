@@ -336,12 +336,15 @@
 
     function computeRadius() {
       const cardWidth = cards[0].getBoundingClientRect().width || 300;
+      // Il moltiplicatore 1.4 lascia un vero spazio tra una scheda e
+      // l'altra: senza, il raggio minimo le disporrebbe bordo a bordo.
+      const spacing = 1.4;
       if (count <= 2) {
-        radius = cardWidth * 0.75;
+        radius = cardWidth * 0.75 * spacing;
         return;
       }
       const denom = Math.tan(Math.PI / count);
-      radius = denom > 0.0001 ? cardWidth / 2 / denom : cardWidth * 0.75;
+      radius = (denom > 0.0001 ? cardWidth / 2 / denom : cardWidth * 0.75) * spacing;
     }
 
     function normalizeAngleDiff(deg) {
@@ -386,7 +389,11 @@
     }
     function scheduleAutoplay() {
       pauseAutoplay();
-      if (prefersReducedMotion || count <= 1) return;
+      // Nota: non si esclude qui in base a prefers-reduced-motion — la
+      // regola globale in base.css forza già transizioni/animazioni a
+      // durata quasi nulla per chi lo richiede, quindi il contenuto
+      // avanza comunque ma senza il movimento vero e proprio.
+      if (count <= 1) return;
       autoplayTimer = setTimeout(() => goTo(currentIndex + 1, true), AUTOPLAY_DELAY);
     }
 
