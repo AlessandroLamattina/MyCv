@@ -119,6 +119,11 @@
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: var(--space-6);
+  opacity: 0;
+  transform: translateY(10px);
+}
+.menu-overlay[data-open="true"] .menu-overlay__label {
+  animation: menu-item-in 0.45s var(--ease-out) both;
 }
 
 .menu-overlay__links {
@@ -137,7 +142,35 @@
   letter-spacing: -0.02em;
   color: var(--bg);
   text-decoration: none;
+  opacity: 0;
+  transform: translateY(16px);
   transition: color 0.2s var(--ease-out), padding-left 0.2s var(--ease-out);
+}
+
+/* Effetto a comparsa: ogni voce appare in sequenza (come nel menu
+   originale), non tutte insieme col resto dell'overlay. L'animazione
+   riparte a ogni apertura perché la regola esiste solo quando
+   [data-open="true"] la fa corrispondere. */
+.menu-overlay[data-open="true"] .menu-overlay__links a {
+  animation: menu-item-in 0.5s var(--ease-out) both;
+}
+.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(1) { animation-delay: 0.08s; }
+.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(2) { animation-delay: 0.13s; }
+.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(3) { animation-delay: 0.18s; }
+.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(4) { animation-delay: 0.23s; }
+.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(5) { animation-delay: 0.28s; }
+.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(6) { animation-delay: 0.33s; }
+.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(7) { animation-delay: 0.38s; }
+
+@keyframes menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .menu-overlay__links a .idx {
   font-family: var(--font-mono);
