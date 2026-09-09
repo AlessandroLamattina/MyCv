@@ -101,6 +101,22 @@
   transition: opacity 0.35s var(--ease-in-out), transform 0.35s var(--ease-in-out);
 }
 
+/* Stessa eccezione voluta a "riduci animazioni" applicata all'anello:
+   l'apertura e la chiusura del menu devono restare percepibili, altrimenti
+   la schermata compare e sparisce di colpo senza far capire cosa accade.
+   Il selettore di classe batte la regola globale su * in base.css. */
+@media (prefers-reduced-motion: reduce) {
+  .menu-overlay,
+  .menu-overlay[data-open="true"] {
+    transition-duration: 0.35s, 0.35s, 0s !important;
+  }
+  .menu-fab__bars span,
+  .menu-fab__bars span::before,
+  .menu-fab__bars span::after {
+    transition-duration: 0.25s !important;
+  }
+}
+
 .menu-overlay__inner {
   width: 100%;
   max-width: var(--container);
