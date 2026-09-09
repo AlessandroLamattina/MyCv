@@ -16,9 +16,10 @@
 
     grid.innerHTML = certificates
       .map((cert, i) => {
+        const docIcon = window.CV_ICON ? window.CV_ICON("doc", 32) : "";
         const media = cert.image
           ? `<img src="${cert.image}" alt="Anteprima certificato — ${cert.title}" loading="lazy" decoding="async">`
-          : `<span class="cert-card__media--doc" aria-hidden="true">📄</span>`;
+          : `<span class="cert-card__media--doc">${docIcon}</span>`;
         return `
         <article class="glass-card cert-card reveal">
           <button class="cert-card__media" data-index="${i}" aria-label="Ingrandisci: ${cert.title}" ${cert.image ? "" : "disabled"}>

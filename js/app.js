@@ -1,18 +1,57 @@
 /**
  * app.js — comportamento condiviso da tutte le pagine:
- * tema, navbar/hamburger, back-to-top, reveal on scroll,
- * più il render dei blocchi dati (home, progetti).
+ * tema, menu a comparsa (burger flottante in basso a sinistra), carosello
+ * esperienze, back-to-top, reveal on scroll, più il render dei blocchi
+ * dati (home, progetti) con un set di icone SVG proprio invece di emoji.
  *
- * Scritto per degradare bene: ogni funzione controlla che gli
- * elementi che le servono esistano davvero prima di agganciarsi
- * (a differenza del vecchio script.js/python.js che assumeva
- * sempre la presenza di #home, .carousel, ecc. e andava in errore
- * sulle pagine dove quegli elementi non ci sono).
+ * Scritto per degradare bene: ogni funzione controlla che gli elementi
+ * che le servono esistano davvero prima di agganciarsi.
  */
 (function () {
   "use strict";
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ------------------------------------------------------------------ */
+  /* Set di icone SVG (sostituisce le emoji usate in precedenza)         */
+  /* ------------------------------------------------------------------ */
+  const ICON_PATHS = {
+    pin: '<path d="M12 21s-6.5-6-6.5-10.8A6.5 6.5 0 0 1 18.5 10.2C18.5 15 12 21 12 21Z"/><circle cx="12" cy="10" r="2.3"/>',
+    phone: '<path d="M5 4h3l1.3 3.8-1.8 1.4a11 11 0 0 0 4.8 4.8l1.4-1.8L18.5 13.5v3a1.3 1.3 0 0 1-1.4 1.3A15 15 0 0 1 4.2 5.4 1.3 1.3 0 0 1 5.5 4Z"/>',
+    mail: '<rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>',
+    graduation: '<path d="M2 9 12 4l10 5-10 5-10-5Z"/><path d="M6 12.3V17c0 1.4 2.8 2.7 6 2.7s6-1.3 6-2.7v-4.7"/><path d="M22 9v5.5"/>',
+    network: '<circle cx="12" cy="5" r="2.1"/><circle cx="5" cy="18.5" r="2.1"/><circle cx="19" cy="18.5" r="2.1"/><path d="M12 7.1v5.4m0 0-5.8 4M12 12.5l5.8 4"/>',
+    cloud: '<path d="M7.5 18h9.7a3.8 3.8 0 0 0 .4-7.6 5.6 5.6 0 0 0-10.7-1.5A4.2 4.2 0 0 0 7.5 18Z"/>',
+    device: '<rect x="7" y="2.5" width="10" height="19" rx="1.6"/><path d="M10.8 18.2h2.4"/>',
+    grid: '<rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/>',
+    layers: '<path d="M3.5 8 12 3.5 20.5 8 12 12.5 3.5 8Z"/><path d="m3.5 12.2 8.5 4.3 8.5-4.3"/><path d="m3.5 16.2 8.5 4.3 8.5-4.3"/>',
+    terminal: '<rect x="2.5" y="4.5" width="19" height="15" rx="1.5"/><path d="m6.5 9.5 4 3-4 3"/><path d="M12.5 15.5h5"/>',
+    code: '<path d="m8.5 8-4 4 4 4"/><path d="m15.5 8 4 4-4 4"/>',
+    ticket: '<path d="M3 8.3A2.3 2.3 0 0 1 5.3 6h13.4A2.3 2.3 0 0 1 21 8.3v1.9a1.7 1.7 0 0 0 0 3.2v1.9a2.3 2.3 0 0 1-2.3 2.4H5.3A2.3 2.3 0 0 1 3 15.3v-1.9a1.7 1.7 0 0 0 0-3.2Z"/><path d="M9.3 6.3v11.4"/>',
+    clipboard: '<rect x="5.5" y="4.5" width="13" height="17" rx="1.5"/><rect x="9" y="2.5" width="6" height="3.5" rx="1"/><path d="M8.5 11h7M8.5 14.5h7M8.5 18h4"/>',
+    lock: '<rect x="5" y="11" width="14" height="9" rx="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    award: '<circle cx="12" cy="8.3" r="5.3"/><path d="m8.3 13-1.6 6.7 5.3-2.5 5.3 2.5-1.6-6.7"/>',
+    camera: '<rect x="3" y="7" width="14" height="11" rx="1.8"/><path d="m17 10.3 4-2.2v7.8l-4-2.2"/><circle cx="10" cy="12.5" r="3"/>',
+    download: '<path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 19.5h14"/>',
+    chevronLeft: '<path d="M14.5 6 8 12l6.5 6"/>',
+    chevronRight: '<path d="M9.5 6 16 12l-6.5 6"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
+    doc: '<path d="M7 3.5h7l4 4v13a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20.5v-15A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4"/>',
+    external: '<path d="M7 17 17 7M8 7h9v9"/>',
+    dot: '<circle cx="12" cy="12" r="3"/>',
+    burst: '<path d="M12 2v6M12 16v6M4.2 4.2l4.2 4.2M15.6 15.6l4.2 4.2M2 12h6M16 12h6M4.2 19.8l4.2-4.2M15.6 8.4l4.2-4.2"/>',
+  };
+
+  function icon(name, size) {
+    const inner = ICON_PATHS[name] || ICON_PATHS.dot;
+    const px = size || 20;
+    return (
+      '<svg width="' + px + '" height="' + px + '" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      inner +
+      "</svg>"
+    );
+  }
 
   /* ------------------------------------------------------------------ */
   /* Tema chiaro/scuro                                                   */
@@ -35,7 +74,7 @@
         if (theme) localStorage.setItem("cv-theme", theme);
         else localStorage.removeItem("cv-theme");
       } catch (err) {
-        /* localStorage non disponibile (privacy mode ecc.): nessun problema, il tema resta solo per la sessione */
+        /* localStorage non disponibile: il tema resta valido solo per la sessione */
       }
     }
 
@@ -48,39 +87,52 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Navbar mobile                                                       */
+  /* Menu a comparsa: burger flottante in basso a sinistra + overlay      */
   /* ------------------------------------------------------------------ */
-  function initNav() {
-    const toggle = document.querySelector(".nav__toggle");
-    const links = document.querySelector(".nav__links");
-    if (!toggle || !links) return;
+  function initMenuOverlay() {
+    const fab = document.querySelector(".menu-fab");
+    const overlay = document.querySelector(".menu-overlay");
+    const main = document.getElementById("main");
+    if (!fab || !overlay) return;
+
+    let lastFocused = null;
 
     function close() {
-      toggle.setAttribute("aria-expanded", "false");
-      links.setAttribute("data-open", "false");
+      fab.setAttribute("aria-expanded", "false");
+      overlay.setAttribute("data-open", "false");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("menu-open");
+      document.body.style.overflow = "";
+      if (main) main.removeAttribute("inert");
+      if (lastFocused) lastFocused.focus();
     }
     function open() {
-      toggle.setAttribute("aria-expanded", "true");
-      links.setAttribute("data-open", "true");
+      lastFocused = document.activeElement;
+      fab.setAttribute("aria-expanded", "true");
+      overlay.setAttribute("data-open", "true");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.classList.add("menu-open");
+      document.body.style.overflow = "hidden";
+      if (main) main.setAttribute("inert", "");
+      const firstLink = overlay.querySelector("a");
+      if (firstLink) firstLink.focus();
     }
 
-    toggle.addEventListener("click", () => {
-      const isOpen = toggle.getAttribute("aria-expanded") === "true";
-      isOpen ? close() : open();
+    fab.addEventListener("click", () => {
+      fab.getAttribute("aria-expanded") === "true" ? close() : open();
     });
 
-    links.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
+    overlay.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+      if (e.key === "Escape" && fab.getAttribute("aria-expanded") === "true") {
         close();
-        toggle.focus();
       }
     });
   }
 
   /* ------------------------------------------------------------------ */
-  /* Back to top (un solo listener per tutte le pagine, throttled)       */
+  /* Back to top                                                         */
   /* ------------------------------------------------------------------ */
   function initBackToTop() {
     const btn = document.querySelector(".back-to-top");
@@ -182,19 +234,19 @@
       </div>
       <div class="glass-card info-card reveal">
         <div class="info-item">
-          <span class="info-item__icon" aria-hidden="true">📍</span>
+          <span class="info-item__icon">${icon("pin", 18)}</span>
           <div><div class="info-item__label">Residenza</div><div class="info-item__value">${personalInfo.home}</div></div>
         </div>
         <div class="info-item">
-          <span class="info-item__icon" aria-hidden="true">📞</span>
+          <span class="info-item__icon">${icon("phone", 18)}</span>
           <div><div class="info-item__label">Telefono</div><div class="info-item__value"><a href="tel:${personalInfo.phone.replace(/\s+/g, "")}">${personalInfo.phone}</a></div></div>
         </div>
         <div class="info-item">
-          <span class="info-item__icon" aria-hidden="true">✉️</span>
+          <span class="info-item__icon">${icon("mail", 18)}</span>
           <div><div class="info-item__label">Email</div><div class="info-item__value"><a href="mailto:${personalInfo.email}">${personalInfo.email}</a><br><a href="mailto:${personalInfo.email2}">${personalInfo.email2}</a></div></div>
         </div>
         <div class="info-item">
-          <span class="info-item__icon" aria-hidden="true">🎓</span>
+          <span class="info-item__icon">${icon("graduation", 18)}</span>
           <div><div class="info-item__label">Formazione</div><div class="info-item__value">${education
             .map((e) => `${e.degree} — ${e.school} (${e.year})`)
             .join("<br>")}</div></div>
@@ -204,37 +256,136 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Render: timeline esperienze (home)                                  */
+  /* Render + comportamento: carosello esperienze (home)                 */
   /* ------------------------------------------------------------------ */
   function renderExperiences(data) {
-    const root = document.getElementById("timeline");
-    if (!root) return;
+    const track = document.getElementById("exp-track");
+    const carousel = document.getElementById("exp-carousel");
+    if (!track || !carousel) return;
 
-    root.innerHTML = data.experiences
+    const experiences = data.experiences;
+
+    track.innerHTML = experiences
       .map(
         (exp) => `
-      <article class="timeline-item reveal${exp.current ? " timeline-item--current" : ""}">
-        <div class="timeline-item__dot" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/></svg>
+      <article class="glass-card exp-card reveal${exp.current ? " exp-card--current" : ""}">
+        <div class="exp-card__head">
+          <h3>${exp.title}</h3>
+          <span class="exp-card__period">${exp.period}</span>
         </div>
-        <div class="glass-card timeline-item__card">
-          <div class="timeline-item__head">
-            <h3>${exp.title}</h3>
-            <span class="timeline-item__period">${exp.period}</span>
-          </div>
-          <div class="timeline-item__company">${exp.company}</div>
-          <p class="timeline-item__desc">${exp.description}</p>
-          <ul class="timeline-item__tasks">
-            ${exp.tasks.map((t) => `<li>${t}</li>`).join("")}
-          </ul>
-          <div class="badge-row">
-            ${exp.tags.map((t) => `<span class="badge">${t}</span>`).join("")}
-          </div>
+        <div class="exp-card__company">${exp.company}</div>
+        <p class="exp-card__desc">${exp.description}</p>
+        <ul class="exp-card__tasks">
+          ${exp.tasks.map((t) => `<li>${t}</li>`).join("")}
+        </ul>
+        <div class="badge-row">
+          ${exp.tags.map((t) => `<span class="badge">${t}</span>`).join("")}
         </div>
       </article>
     `
       )
       .join("");
+
+    const prevBtn = carousel.querySelector("[data-exp-prev]");
+    const nextBtn = carousel.querySelector("[data-exp-next]");
+    const counterCurrent = carousel.querySelector("[data-exp-current]");
+    const counterTotal = carousel.querySelector("[data-exp-total]");
+    const dotsRoot = carousel.querySelector("[data-exp-dots]");
+    const cards = Array.from(track.children);
+
+    if (counterTotal) counterTotal.textContent = String(experiences.length).padStart(2, "0");
+
+    if (dotsRoot) {
+      dotsRoot.innerHTML = cards
+        .map((_, i) => `<button aria-label="Vai all'esperienza ${i + 1}" data-go="${i}"></button>`)
+        .join("");
+    }
+
+    function cardStep() {
+      const first = cards[0];
+      const second = cards[1];
+      if (!first) return 0;
+      const style = getComputedStyle(track);
+      const gap = parseFloat(style.columnGap || style.gap || "0") || 0;
+      return first.getBoundingClientRect().width + gap;
+    }
+
+    function closestIndex() {
+      const trackRect = track.getBoundingClientRect();
+      let best = 0;
+      let bestDist = Infinity;
+      cards.forEach((card, i) => {
+        const dist = Math.abs(card.getBoundingClientRect().left - trackRect.left);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      return best;
+    }
+
+    function updateUI() {
+      const idx = closestIndex();
+      if (counterCurrent) counterCurrent.textContent = String(idx + 1).padStart(2, "0");
+      if (prevBtn) prevBtn.disabled = track.scrollLeft <= 4;
+      if (nextBtn) nextBtn.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 4;
+      if (dotsRoot) {
+        Array.from(dotsRoot.children).forEach((dot, i) => {
+          dot.setAttribute("aria-current", i === idx ? "true" : "false");
+        });
+      }
+    }
+
+    let scrollTicking = false;
+    track.addEventListener(
+      "scroll",
+      () => {
+        if (!scrollTicking) {
+          requestAnimationFrame(() => {
+            updateUI();
+            scrollTicking = false;
+          });
+          scrollTicking = true;
+        }
+      },
+      { passive: true }
+    );
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        track.scrollBy({ left: -cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        track.scrollBy({ left: cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
+      });
+    }
+    if (dotsRoot) {
+      dotsRoot.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-go]");
+        if (!btn) return;
+        const i = Number(btn.dataset.go);
+        const target = cards[i];
+        if (target) {
+          track.scrollTo({ left: target.offsetLeft - track.offsetLeft, behavior: prefersReducedMotion ? "auto" : "smooth" });
+        }
+      });
+    }
+
+    track.setAttribute("tabindex", "0");
+    track.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        track.scrollBy({ left: cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        track.scrollBy({ left: -cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
+      }
+    });
+
+    window.addEventListener("resize", updateUI);
+    updateUI();
   }
 
   /* ------------------------------------------------------------------ */
@@ -247,8 +398,8 @@
     root.innerHTML = data.skills
       .map(
         (s) => `
-      <div class="glass-card skill-card reveal">
-        <span class="skill-card__icon" aria-hidden="true">${s.icon}</span>
+      <div class="skill-card reveal">
+        <span class="skill-card__icon">${icon(s.icon, 18)}</span>
         <div><h3>${s.name}</h3><p>${s.note}</p></div>
       </div>
     `
@@ -292,8 +443,7 @@
         <div class="badge-row">${p.tags.map((t) => `<span class="badge">${t}</span>`).join("")}</div>
         ${
           p.link
-            ? `<div class="project-card__footer"><a class="project-card__link" href="${p.link.href}" target="_blank" rel="noopener">${p.link.label}
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>`
+            ? `<div class="project-card__footer"><a class="project-card__link" href="${p.link.href}" target="_blank" rel="noopener">${p.link.label} ${icon("external", 16)}</a></div>`
             : ""
         }
       </article>
@@ -313,9 +463,7 @@
         <p>${p.description}</p>
         <div class="badge-row">${p.tags.map((t) => `<span class="badge">${t}</span>`).join("")}</div>
         <div class="project-card__footer">
-          <a class="project-card__link" href="${p.link.href}" target="_blank" rel="noopener">${p.link.label}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
-          </a>
+          <a class="project-card__link" href="${p.link.href}" target="_blank" rel="noopener">${p.link.label} ${icon("external", 16)}</a>
         </div>
       </article>
     `
@@ -330,14 +478,12 @@
       .map(
         (t) => `
       <article class="glass-card project-card reveal">
-        <div class="tool-card__icon" aria-hidden="true">${t.icon}</div>
+        <div class="tool-card__icon">${icon(t.icon, 18)}</div>
         <h3>${t.title}</h3>
         <p>${t.description}</p>
         <div class="badge-row">${t.tags.map((tag) => `<span class="badge">${tag}</span>`).join("")}</div>
         <div class="project-card__footer">
-          <a class="project-card__link" href="${t.path}" download>Scarica sorgente
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
-          </a>
+          <a class="project-card__link" href="${t.path}" download>Scarica sorgente ${icon("download", 16)}</a>
         </div>
       </article>
     `
@@ -350,7 +496,7 @@
   /* ------------------------------------------------------------------ */
   document.addEventListener("DOMContentLoaded", () => {
     initTheme();
-    initNav();
+    initMenuOverlay();
     initBackToTop();
     initSmoothScroll();
     initFooterYear();
@@ -369,4 +515,7 @@
     // generati dinamicamente non sarebbero ancora nel DOM da osservare.
     initReveal();
   });
+
+  // Esposto per riuso da certificates.js (stesso set di icone, un solo posto da mantenere).
+  window.CV_ICON = icon;
 })();

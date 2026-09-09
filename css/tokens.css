@@ -1,53 +1,53 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   Design tokens — palette, superfici, tipografia, spaziature
-   Tema chiaro di default; il tema scuro è definito due volte:
+   Design tokens
+   Direzione estetica: editoriale/Swiss — un solo colore segnale (nessun
+   gradiente viola/blu/teal), superfici piatte con bordo netto invece del
+   glassmorphism diffuso, coppia tipografica grottesco + mono, angoli
+   quasi retti. Tema chiaro di default; il tema scuro è definito due volte:
    - @media (prefers-color-scheme: dark) per chi non ha scelto nulla
    - :root[data-theme="dark"] per la scelta esplicita dal toggle
    ========================================================================== */
 
 :root {
-  /* Colori di base */
-  --bg: #f5f5f7;
-  --bg-elevated: #ffffff;
-  --bg-subtle: #ebebef;
-  --text: #1d1d1f;
-  --text-secondary: #4b4b50;
-  --text-muted: #6e6e73;
-  --accent: #0071e3;
-  --accent-hover: #0077ed;
-  --accent-contrast: #ffffff;
-  --accent-soft: rgba(0, 113, 227, 0.1);
-  --hairline: rgba(0, 0, 0, 0.1);
+  /* Colori di base — carta e inchiostro, un solo segnale cromatico */
+  --bg: #f2f1ec;
+  --bg-elevated: #fbfaf6;
+  --bg-subtle: #e7e5dd;
+  --bg-inverse: #16150f;
+  --text: #16150f;
+  --text-secondary: #4a483f;
+  --text-muted: #78766a;
+  --accent: #e1421c;
+  --accent-hover: #c8360f;
+  --accent-contrast: #fbfaf6;
+  --accent-soft: rgba(225, 66, 28, 0.1);
+  --hairline: rgba(22, 21, 15, 0.15);
+  --hairline-strong: rgba(22, 21, 15, 0.3);
 
-  /* Superfici in vetro */
-  --glass-bg: rgba(255, 255, 255, 0.66);
-  --glass-bg-strong: rgba(255, 255, 255, 0.86);
-  --glass-border: rgba(255, 255, 255, 0.7);
-  --glass-blur: 20px;
+  /* Superfici — piatte, con bordo netto invece del blur */
+  --surface: var(--bg-elevated);
+  --surface-border: var(--hairline);
+  --overlay-scrim: rgba(22, 21, 15, 0.9);
 
-  /* Sfondo decorativo dell'hero (fallback senza WebGL) */
-  --aurora-1: rgba(0, 113, 227, 0.35);
-  --aurora-2: rgba(120, 80, 220, 0.25);
-  --aurora-3: rgba(0, 200, 190, 0.22);
+  /* Ombre — minime, quasi assenti (la texture è il bordo, non l'ombra) */
+  --shadow-sm: 0 1px 0 rgba(22, 21, 15, 0.06);
+  --shadow-md: 0 2px 0 rgba(22, 21, 15, 0.08);
+  --shadow-lg: 0 12px 32px rgba(22, 21, 15, 0.14);
 
-  /* Ombre */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08), 0 24px 64px rgba(0, 0, 0, 0.1);
+  /* Raggi — quasi retti, non il "tutto arrotondato" da bento AI */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-pill: 4px;
 
-  /* Raggi */
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 28px;
-  --radius-pill: 980px;
-
-  /* Tipografia */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+  /* Tipografia — grottesco per i titoli, mono per etichette/date/numeri */
+  --font-display: "Space Grotesk", "Archivo", -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, "Liberation Mono", monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -56,7 +56,7 @@
   --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
   --text-2xl: clamp(1.5rem, 1.25rem + 1.1vw, 2rem);
   --text-3xl: clamp(1.875rem, 1.4rem + 2vw, 2.75rem);
-  --text-hero: clamp(2.5rem, 1.4rem + 5.2vw, 5rem);
+  --text-hero: clamp(2.75rem, 1.4rem + 6.4vw, 6.5rem);
 
   /* Spaziature */
   --space-1: 0.25rem;
@@ -70,8 +70,9 @@
   --space-9: 6rem;
 
   /* Layout */
-  --container: 1120px;
+  --container: 1180px;
   --nav-height: 52px;
+  --fab-size: 56px;
 
   /* Movimento */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -84,29 +85,25 @@
 /* Tema scuro — preferenza di sistema, se l'utente non ha scelto "light" */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #000000;
-    --bg-elevated: #1c1c1e;
-    --bg-subtle: #16161a;
-    --text: #f5f5f7;
-    --text-secondary: #c7c7cc;
-    --text-muted: #98989d;
-    --accent: #2997ff;
-    --accent-hover: #47a6ff;
-    --accent-contrast: #001225;
-    --accent-soft: rgba(41, 151, 255, 0.16);
-    --hairline: rgba(255, 255, 255, 0.14);
+    --bg: #100f0b;
+    --bg-elevated: #1a1912;
+    --bg-subtle: #211f17;
+    --bg-inverse: #f2f1ec;
+    --text: #f2f1ec;
+    --text-secondary: #c7c4b6;
+    --text-muted: #918e7f;
+    --accent: #ff6a3d;
+    --accent-hover: #ff8462;
+    --accent-contrast: #100f0b;
+    --accent-soft: rgba(255, 106, 61, 0.16);
+    --hairline: rgba(242, 241, 236, 0.16);
+    --hairline-strong: rgba(242, 241, 236, 0.32);
 
-    --glass-bg: rgba(28, 28, 30, 0.62);
-    --glass-bg-strong: rgba(20, 20, 22, 0.84);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --overlay-scrim: rgba(0, 0, 0, 0.92);
 
-    --aurora-1: rgba(41, 151, 255, 0.35);
-    --aurora-2: rgba(140, 90, 255, 0.28);
-    --aurora-3: rgba(0, 210, 190, 0.2);
-
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.45);
+    --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
 
     color-scheme: dark;
   }
@@ -114,29 +111,25 @@
 
 /* Tema scuro — scelta esplicita dal toggle (vince sempre) */
 :root[data-theme="dark"] {
-  --bg: #000000;
-  --bg-elevated: #1c1c1e;
-  --bg-subtle: #16161a;
-  --text: #f5f5f7;
-  --text-secondary: #c7c7cc;
-  --text-muted: #98989d;
-  --accent: #2997ff;
-  --accent-hover: #47a6ff;
-  --accent-contrast: #001225;
-  --accent-soft: rgba(41, 151, 255, 0.16);
-  --hairline: rgba(255, 255, 255, 0.14);
+  --bg: #100f0b;
+  --bg-elevated: #1a1912;
+  --bg-subtle: #211f17;
+  --bg-inverse: #f2f1ec;
+  --text: #f2f1ec;
+  --text-secondary: #c7c4b6;
+  --text-muted: #918e7f;
+  --accent: #ff6a3d;
+  --accent-hover: #ff8462;
+  --accent-contrast: #100f0b;
+  --accent-soft: rgba(255, 106, 61, 0.16);
+  --hairline: rgba(242, 241, 236, 0.16);
+  --hairline-strong: rgba(242, 241, 236, 0.32);
 
-  --glass-bg: rgba(28, 28, 30, 0.62);
-  --glass-bg-strong: rgba(20, 20, 22, 0.84);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --overlay-scrim: rgba(0, 0, 0, 0.92);
 
-  --aurora-1: rgba(41, 151, 255, 0.35);
-  --aurora-2: rgba(140, 90, 255, 0.28);
-  --aurora-3: rgba(0, 210, 190, 0.2);
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 24px 64px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
 
   color-scheme: dark;
 }

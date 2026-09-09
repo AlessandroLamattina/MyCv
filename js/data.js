@@ -120,17 +120,18 @@
     },
   ];
 
-  // Competenze raggruppate per area
+  // Competenze raggruppate per area — "icon" fa riferimento a una chiave
+  // del set SVG definito in app.js (ICONS), non a un'emoji.
   const skills = [
-    { name: "Server & Networking", icon: "🖧", note: "Infrastruttura, gestione reti aziendali" },
-    { name: "Microsoft Azure", icon: "☁️", note: "Amministrazione, Entra ID" },
-    { name: "Microsoft Intune", icon: "📱", note: "MDM, deployment client" },
-    { name: "Microsoft 365", icon: "🧩", note: "Amministrazione e deployment" },
-    { name: "Odoo", icon: "🗂️", note: "Sviluppo e personalizzazione gestionale" },
-    { name: "PowerShell", icon: "💻", note: "Automazione e scripting" },
-    { name: "Python", icon: "🐍", note: "Tool e automazioni" },
-    { name: "Jira / ServiceNow", icon: "🎫", note: "Gestione ticket e progetti" },
-    { name: "Project Management", icon: "📋", note: "Pianificazione e coordinamento" },
+    { name: "Server & Networking", icon: "network", note: "Infrastruttura, gestione reti aziendali" },
+    { name: "Microsoft Azure", icon: "cloud", note: "Amministrazione, Entra ID" },
+    { name: "Microsoft Intune", icon: "device", note: "MDM, deployment client" },
+    { name: "Microsoft 365", icon: "grid", note: "Amministrazione e deployment" },
+    { name: "Odoo", icon: "layers", note: "Sviluppo e personalizzazione gestionale" },
+    { name: "PowerShell", icon: "terminal", note: "Automazione e scripting" },
+    { name: "Python", icon: "code", note: "Tool e automazioni" },
+    { name: "Jira / ServiceNow", icon: "ticket", note: "Gestione ticket e progetti" },
+    { name: "Project Management", icon: "clipboard", note: "Pianificazione e coordinamento" },
   ];
 
   // Certificati — le immagini in file/ mostrano un'anteprima, i .pdf sono i documenti completi
@@ -206,14 +207,14 @@
       description: "Applicazione desktop (PyQt5) che cerca curriculum sul PC e nelle librerie SharePoint dell'utente tramite Microsoft Graph API, e scansiona le cartelle di Outlook (via COM) alla ricerca di email con CV in allegato. Esporta i risultati in Excel.",
       tags: ["Python", "PyQt5", "Microsoft Graph", "Outlook COM"],
       path: "tools/cv_finder.py",
-      icon: "🗃️",
+      icon: "doc",
     },
     {
       title: "Java Version Checker",
       description: "Script PowerShell che verifica quali applicativi aziendali richiedono una versione di Java sono installati, ne confronta la versione richiesta con quella installata sul PC e propone l'aggiornamento automatico se necessario.",
       tags: ["PowerShell", "Automazione IT"],
       path: "tools/main.ps1",
-      icon: "⚙️",
+      icon: "terminal",
     },
   ];
 

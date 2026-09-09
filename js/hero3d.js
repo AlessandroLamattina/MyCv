@@ -3,9 +3,8 @@
  *
  * Attivo solo se: Three.js è disponibile da CDN, il browser supporta
  * WebGL, lo schermo è >= 768px e l'utente non ha impostato
- * prefers-reduced-motion. In ogni altro caso resta visibile il
- * fallback CSS statico (.hero__fallback-bg), quindi l'hero è sempre
- * presentabile anche senza JS o senza rete.
+ * prefers-reduced-motion. In ogni altro caso l'hero resta comunque
+ * presentabile: lo sfondo a griglia è puro CSS, senza dipendenze da JS.
  */
 (function () {
   "use strict";
@@ -33,9 +32,9 @@
   let renderer, scene, camera, points, raf;
   let running = false;
 
-  function getAccentColors() {
+  function getAccentColor() {
     const styles = getComputedStyle(document.documentElement);
-    return [styles.getPropertyValue("--accent").trim() || "#0071e3", "#7c5cff", "#00c8be"];
+    return styles.getPropertyValue("--accent").trim() || "#e1421c";
   }
 
   function init() {
@@ -57,12 +56,11 @@
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
-    const colors = getAccentColors();
     const material = new THREE.PointsMaterial({
-      color: new THREE.Color(colors[0]),
-      size: 0.045,
+      color: new THREE.Color(getAccentColor()),
+      size: 0.04,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.55,
       depthWrite: false,
     });
 
