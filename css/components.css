@@ -18,6 +18,7 @@
   background: var(--bg);
   padding: 0.35rem 0.6rem;
   border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
 }
 .brand-mark::before {
   content: "AL";
@@ -31,6 +32,7 @@
   color: var(--accent-contrast);
   font-size: 0.85em;
   font-weight: 700;
+  border-radius: calc(var(--radius-sm) - 4px);
   vertical-align: middle;
 }
 
@@ -94,16 +96,19 @@
   flex-direction: column;
   justify-content: center;
   padding: var(--space-8) var(--space-6);
-  opacity: 0;
   visibility: hidden;
-  transform: translateY(2%);
-  transition: opacity 0.35s var(--ease-in-out), transform 0.35s var(--ease-in-out), visibility 0s linear 0.35s;
+  /* Comparsa a schermata unica: un cerchio che si espande dal pulsante
+     burger (le coordinate --reveal-x/--reveal-y arrivano da app.js) fino
+     a coprire tutto il viewport. Non c'è un fade separato del testo: il
+     contenuto è già al suo posto, il cerchio lo scopre man mano che
+     cresce, quindi non si percepiscono due fasi distinte. */
+  clip-path: circle(0% at var(--reveal-x, 40px) var(--reveal-y, calc(100% - 40px)));
+  transition: clip-path 0.65s var(--ease-in-out), visibility 0s linear 0.65s;
 }
 .menu-overlay[data-open="true"] {
-  opacity: 1;
   visibility: visible;
-  transform: none;
-  transition: opacity 0.35s var(--ease-in-out), transform 0.35s var(--ease-in-out);
+  clip-path: circle(150% at var(--reveal-x, 40px) var(--reveal-y, calc(100% - 40px)));
+  transition: clip-path 0.65s var(--ease-in-out);
 }
 
 .menu-overlay__inner {
@@ -119,11 +124,6 @@
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: var(--space-6);
-  opacity: 0;
-  transform: translateY(10px);
-}
-.menu-overlay[data-open="true"] .menu-overlay__label {
-  animation: menu-item-in 0.45s var(--ease-out) both;
 }
 
 .menu-overlay__links {
@@ -142,35 +142,7 @@
   letter-spacing: -0.02em;
   color: var(--bg);
   text-decoration: none;
-  opacity: 0;
-  transform: translateY(16px);
   transition: color 0.2s var(--ease-out), padding-left 0.2s var(--ease-out);
-}
-
-/* Effetto a comparsa: ogni voce appare in sequenza (come nel menu
-   originale), non tutte insieme col resto dell'overlay. L'animazione
-   riparte a ogni apertura perché la regola esiste solo quando
-   [data-open="true"] la fa corrispondere. */
-.menu-overlay[data-open="true"] .menu-overlay__links a {
-  animation: menu-item-in 0.5s var(--ease-out) both;
-}
-.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(1) { animation-delay: 0.08s; }
-.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(2) { animation-delay: 0.13s; }
-.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(3) { animation-delay: 0.18s; }
-.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(4) { animation-delay: 0.23s; }
-.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(5) { animation-delay: 0.28s; }
-.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(6) { animation-delay: 0.33s; }
-.menu-overlay[data-open="true"] .menu-overlay__links a:nth-child(7) { animation-delay: 0.38s; }
-
-@keyframes menu-item-in {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 .menu-overlay__links a .idx {
   font-family: var(--font-mono);
@@ -304,11 +276,6 @@ body.menu-open .back-to-top {
   align-items: flex-end;
   overflow: hidden;
   padding-block: var(--space-8) var(--space-9);
-  background-image:
-    linear-gradient(to bottom, var(--hairline) 1px, transparent 1px),
-    linear-gradient(to right, var(--hairline) 1px, transparent 1px);
-  background-size: 100% 96px, min(33.33%, 340px) 100%;
-  background-position: top left;
 }
 
 .hero__canvas {
@@ -421,7 +388,7 @@ body.menu-open .back-to-top {
   height: 120px;
   object-fit: cover;
   border: 1px solid var(--hairline-strong);
-  filter: grayscale(1) contrast(1.05);
+  border-radius: var(--radius-md);
 }
 .profile-card h3 {
   font-family: var(--font-display);
@@ -473,6 +440,7 @@ body.menu-open .back-to-top {
   display: grid;
   place-items: center;
   border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
   color: var(--accent);
 }
 .info-item__icon svg { width: 18px; height: 18px; }
@@ -536,6 +504,7 @@ body.menu-open .back-to-top {
   display: grid;
   place-items: center;
   border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
   color: var(--text);
   transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
 }
@@ -552,7 +521,7 @@ body.menu-open .back-to-top {
 
 .exp-ring {
   position: relative;
-  height: 500px;
+  height: 620px;
   margin-bottom: var(--space-5);
   perspective: 1600px;
 }
@@ -577,10 +546,11 @@ body.menu-open .back-to-top {
   top: 50%;
   left: 50%;
   width: min(460px, 82vw);
-  max-height: 430px;
+  max-height: 560px;
+  padding: var(--space-7);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
   overflow: hidden;
   backface-visibility: hidden;
   transition: opacity 0.3s var(--ease-out), filter 0.3s var(--ease-out);
@@ -623,9 +593,9 @@ body.menu-open .back-to-top {
 }
 .exp-card__tasks {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   overflow-y: auto;
-  max-height: 148px;
+  max-height: 230px;
   padding-right: var(--space-2);
   scrollbar-width: thin;
 }
@@ -655,6 +625,7 @@ body.menu-open .back-to-top {
 .badge {
   padding: 0.3rem 0.65rem;
   border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-pill);
   font-family: var(--font-mono);
   color: var(--text-secondary);
   font-size: var(--text-xs);
@@ -677,13 +648,14 @@ body.menu-open .back-to-top {
 
 @media (max-width: 600px) {
   .exp-ring {
-    height: 400px;
+    height: 560px;
   }
   .exp-card {
-    max-height: 360px;
+    max-height: 500px;
+    padding: var(--space-5);
   }
   .exp-card__tasks {
-    max-height: 110px;
+    max-height: 190px;
   }
 }
 
@@ -694,9 +666,7 @@ body.menu-open .back-to-top {
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1px;
-  background: var(--hairline);
-  border: 1px solid var(--hairline);
+  gap: var(--space-4);
 }
 .skill-card {
   display: flex;
@@ -704,8 +674,8 @@ body.menu-open .back-to-top {
   gap: var(--space-4);
   padding: var(--space-5);
   background: var(--surface);
-  border: 0;
-  border-radius: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
   box-shadow: none;
 }
 .skill-card__icon {
@@ -715,6 +685,7 @@ body.menu-open .back-to-top {
   display: grid;
   place-items: center;
   border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
   color: var(--accent);
 }
 .skill-card__icon svg { width: 18px; height: 18px; }
@@ -736,9 +707,7 @@ body.menu-open .back-to-top {
 .link-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--hairline);
-  border: 1px solid var(--hairline);
+  gap: var(--space-4);
 }
 .link-card {
   grid-column: span 1;
@@ -747,8 +716,8 @@ body.menu-open .back-to-top {
   align-items: flex-start;
   gap: var(--space-4);
   text-decoration: none;
-  border: 0;
-  border-radius: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
   box-shadow: none;
   background: var(--surface);
   transition: background 0.2s var(--ease-out);
@@ -762,6 +731,7 @@ body.menu-open .back-to-top {
   display: grid;
   place-items: center;
   border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
   color: var(--accent);
 }
 .link-card__icon svg { width: 22px; height: 22px; }
@@ -803,17 +773,15 @@ body.menu-open .back-to-top {
 .cert-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1px;
-  background: var(--hairline);
-  border: 1px solid var(--hairline);
+  gap: var(--space-4);
 }
 .cert-card {
   padding: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 0;
-  border-radius: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
   box-shadow: none;
 }
 .cert-card__media {
@@ -990,6 +958,7 @@ body.menu-open .back-to-top {
   display: grid;
   place-items: center;
   border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
   color: var(--accent);
   margin-bottom: var(--space-2);
 }
@@ -1024,6 +993,7 @@ body.menu-open .back-to-top {
   place-items: center;
   background: var(--bg);
   border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-md);
   color: var(--text);
   opacity: 0;
   transform: translateY(12px);
@@ -1073,6 +1043,7 @@ body.menu-open .back-to-top {
   display: grid;
   place-items: center;
   border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
   color: var(--accent);
 }
 .webcam-notice__icon svg { width: 16px; height: 16px; }

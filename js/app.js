@@ -97,6 +97,19 @@
 
     let lastFocused = null;
 
+    // Il cerchio della comparsa parte esattamente dal centro del pulsante.
+    // Va sincronizzato PRIMA del primo click (non solo dentro open()),
+    // altrimenti la prima apertura interpola anche la posizione — dal
+    // punto di fallback nel CSS fino al pulsante — invece di crescere
+    // ferma in un solo punto.
+    function syncRevealOrigin() {
+      const rect = fab.getBoundingClientRect();
+      overlay.style.setProperty("--reveal-x", `${rect.left + rect.width / 2}px`);
+      overlay.style.setProperty("--reveal-y", `${rect.top + rect.height / 2}px`);
+    }
+    syncRevealOrigin();
+    window.addEventListener("resize", syncRevealOrigin);
+
     function close() {
       fab.setAttribute("aria-expanded", "false");
       overlay.setAttribute("data-open", "false");
@@ -108,6 +121,7 @@
     }
     function open() {
       lastFocused = document.activeElement;
+      syncRevealOrigin();
       fab.setAttribute("aria-expanded", "true");
       overlay.setAttribute("data-open", "true");
       overlay.setAttribute("aria-hidden", "false");
@@ -317,6 +331,8 @@
     let dragStartX = 0;
     let dragStartY = 0;
     let dragStartRotation = 0;
+    let autoplayTimer = null;
+    const AUTOPLAY_DELAY = 4200;
 
     function computeRadius() {
       const cardWidth = cards[0].getBoundingClientRect().width || 300;
@@ -364,11 +380,22 @@
       }
     }
 
+    function pauseAutoplay() {
+      clearTimeout(autoplayTimer);
+      autoplayTimer = null;
+    }
+    function scheduleAutoplay() {
+      pauseAutoplay();
+      if (prefersReducedMotion || count <= 1) return;
+      autoplayTimer = setTimeout(() => goTo(currentIndex + 1, true), AUTOPLAY_DELAY);
+    }
+
     function goTo(index, animated) {
       currentIndex = ((index % count) + count) % count;
       rotation = -currentIndex * angleStep;
       layout(animated !== false);
       updateUI();
+      scheduleAutoplay();
     }
 
     if (prevBtn) prevBtn.addEventListener("click", () => goTo(currentIndex - 1, true));
@@ -381,11 +408,20 @@
       });
     }
 
+    // L'autoscorrimento si ferma finché l'utente sta guardando/usando la
+    // galleria (hover, focus da tastiera o trascinamento) e riparte da capo
+    // appena la lascia, così non ruota mentre si sta leggendo una scheda.
+    ring.addEventListener("mouseenter", pauseAutoplay);
+    ring.addEventListener("mouseleave", scheduleAutoplay);
+    ring.addEventListener("focusin", pauseAutoplay);
+    ring.addEventListener("focusout", scheduleAutoplay);
+
     // Trascinamento con Pointer Events: unifica mouse e touch. Il gesto
     // resta "libero" (verticale = scroll di pagina, orizzontale = rotazione
     // dell'anello) finché non supera una soglia minima di movimento.
     stage.addEventListener("pointerdown", (e) => {
       if (e.button !== undefined && e.button !== 0) return;
+      pauseAutoplay();
       dragging = true;
       axisLocked = null;
       dragStartX = e.clientX;
@@ -414,6 +450,8 @@
       stage.classList.remove("is-dragging");
       if (axisLocked === "x") {
         goTo(Math.round(-rotation / angleStep), true);
+      } else {
+        scheduleAutoplay();
       }
       axisLocked = null;
     }
