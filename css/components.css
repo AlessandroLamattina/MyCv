@@ -89,19 +89,16 @@
   flex-direction: column;
   justify-content: center;
   padding: var(--space-8) var(--space-6);
+  opacity: 0;
   visibility: hidden;
-  /* Comparsa a schermata unica: un cerchio che si espande dal pulsante
-     burger (le coordinate --reveal-x/--reveal-y arrivano da app.js) fino
-     a coprire tutto il viewport. Non c'è un fade separato del testo: il
-     contenuto è già al suo posto, il cerchio lo scopre man mano che
-     cresce, quindi non si percepiscono due fasi distinte. */
-  clip-path: circle(0% at var(--reveal-x, 40px) var(--reveal-y, calc(100% - 40px)));
-  transition: clip-path 0.65s var(--ease-in-out), visibility 0s linear 0.65s;
+  transform: translateY(2%);
+  transition: opacity 0.35s var(--ease-in-out), transform 0.35s var(--ease-in-out), visibility 0s linear 0.35s;
 }
 .menu-overlay[data-open="true"] {
+  opacity: 1;
   visibility: visible;
-  clip-path: circle(150% at var(--reveal-x, 40px) var(--reveal-y, calc(100% - 40px)));
-  transition: clip-path 0.65s var(--ease-in-out);
+  transform: none;
+  transition: opacity 0.35s var(--ease-in-out), transform 0.35s var(--ease-in-out);
 }
 
 .menu-overlay__inner {
@@ -514,7 +511,7 @@ body.menu-open .back-to-top {
 
 .exp-ring {
   position: relative;
-  height: 620px;
+  height: 440px;
   margin-bottom: var(--space-5);
   perspective: 1600px;
 }
@@ -538,12 +535,12 @@ body.menu-open .back-to-top {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(460px, 82vw);
-  max-height: 560px;
-  padding: var(--space-7);
+  width: min(340px, 78vw);
+  max-height: 400px;
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-3);
   overflow: hidden;
   backface-visibility: hidden;
   transition: opacity 0.3s var(--ease-out), filter 0.3s var(--ease-out);
@@ -559,16 +556,16 @@ body.menu-open .back-to-top {
   justify-content: space-between;
   gap: var(--space-2);
   border-bottom: 1px solid var(--hairline);
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
 }
 .exp-card__head h3 {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: var(--text-base);
   font-weight: 700;
 }
 .exp-card__period {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: 0.7rem;
   font-weight: 500;
   color: var(--text-muted);
   white-space: nowrap;
@@ -579,24 +576,25 @@ body.menu-open .back-to-top {
   font-family: var(--font-mono);
   color: var(--accent);
   font-weight: 500;
-  font-size: var(--text-sm);
+  font-size: 0.7rem;
 }
 .exp-card__desc {
   color: var(--text-secondary);
+  font-size: var(--text-sm);
 }
 .exp-card__tasks {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
   overflow-y: auto;
-  max-height: 230px;
+  max-height: 130px;
   padding-right: var(--space-2);
   scrollbar-width: thin;
 }
 .exp-card__tasks li {
   position: relative;
-  padding-left: var(--space-5);
+  padding-left: var(--space-4);
   color: var(--text-secondary);
-  font-size: var(--text-sm);
+  font-size: 0.8rem;
 }
 .exp-card__tasks li::before {
   content: "";
@@ -616,12 +614,12 @@ body.menu-open .back-to-top {
   padding-top: var(--space-3);
 }
 .badge {
-  padding: 0.3rem 0.65rem;
+  padding: 0.22rem 0.55rem;
   border: 1px solid var(--hairline-strong);
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
   color: var(--text-secondary);
-  font-size: var(--text-xs);
+  font-size: 0.7rem;
 }
 
 .exp-carousel__dots {
@@ -641,14 +639,14 @@ body.menu-open .back-to-top {
 
 @media (max-width: 600px) {
   .exp-ring {
-    height: 560px;
+    height: 400px;
   }
   .exp-card {
-    max-height: 500px;
-    padding: var(--space-5);
+    max-height: 360px;
+    padding: var(--space-4);
   }
   .exp-card__tasks {
-    max-height: 190px;
+    max-height: 110px;
   }
 }
 

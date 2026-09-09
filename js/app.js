@@ -97,19 +97,6 @@
 
     let lastFocused = null;
 
-    // Il cerchio della comparsa parte esattamente dal centro del pulsante.
-    // Va sincronizzato PRIMA del primo click (non solo dentro open()),
-    // altrimenti la prima apertura interpola anche la posizione — dal
-    // punto di fallback nel CSS fino al pulsante — invece di crescere
-    // ferma in un solo punto.
-    function syncRevealOrigin() {
-      const rect = fab.getBoundingClientRect();
-      overlay.style.setProperty("--reveal-x", `${rect.left + rect.width / 2}px`);
-      overlay.style.setProperty("--reveal-y", `${rect.top + rect.height / 2}px`);
-    }
-    syncRevealOrigin();
-    window.addEventListener("resize", syncRevealOrigin);
-
     function close() {
       fab.setAttribute("aria-expanded", "false");
       overlay.setAttribute("data-open", "false");
@@ -121,7 +108,6 @@
     }
     function open() {
       lastFocused = document.activeElement;
-      syncRevealOrigin();
       fab.setAttribute("aria-expanded", "true");
       overlay.setAttribute("data-open", "true");
       overlay.setAttribute("aria-hidden", "false");
