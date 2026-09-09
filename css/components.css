@@ -89,16 +89,19 @@
   flex-direction: column;
   justify-content: center;
   padding: var(--space-8) var(--space-6);
-  opacity: 0;
   visibility: hidden;
-  transform: translateY(2%);
-  transition: opacity 0.35s var(--ease-in-out), transform 0.35s var(--ease-in-out), visibility 0s linear 0.35s;
+  /* Apertura a tendina diagonale: il triangolo di taglio parte collassato
+     nell'angolo in basso a sinistra (dov'è il pulsante burger) e cresce
+     fino a scoprire tutto lo schermo verso l'alto a destra. I vertici
+     sforano il viewport (-150% / 250%) perché il lato obliquo superi
+     l'angolo in alto a destra invece di fermarsi esattamente sopra. */
+  clip-path: polygon(0% 100%, 0% 100%, 0% 100%);
+  transition: clip-path 0.55s var(--ease-in-out), visibility 0s linear 0.55s;
 }
 .menu-overlay[data-open="true"] {
-  opacity: 1;
   visibility: visible;
-  transform: none;
-  transition: opacity 0.35s var(--ease-in-out), transform 0.35s var(--ease-in-out);
+  clip-path: polygon(0% 100%, 0% -150%, 250% 100%);
+  transition: clip-path 0.55s var(--ease-in-out);
 }
 
 /* Stessa eccezione voluta a "riduci animazioni" applicata all'anello:
@@ -106,9 +109,11 @@
    la schermata compare e sparisce di colpo senza far capire cosa accade.
    Il selettore di classe batte la regola globale su * in base.css. */
 @media (prefers-reduced-motion: reduce) {
-  .menu-overlay,
+  .menu-overlay {
+    transition-duration: 0.55s, 0s !important;
+  }
   .menu-overlay[data-open="true"] {
-    transition-duration: 0.35s, 0.35s, 0s !important;
+    transition-duration: 0.55s !important;
   }
   .menu-fab__bars span,
   .menu-fab__bars span::before,
