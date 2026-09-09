@@ -87,8 +87,13 @@
   color: var(--bg);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: var(--space-8) var(--space-6);
+  /* Niente justify-content:center: se il contenuto è più alto della
+     finestra verrebbe tagliato sia sopra sia sotto (com'era: "MENU" e il
+     footer fuori campo). Con overflow-y:auto e margin:auto sull'inner il
+     contenuto resta centrato quando c'è spazio e scorre quando non c'è. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-7) var(--space-6);
   visibility: hidden;
   /* Apertura a tendina diagonale: il triangolo di taglio parte collassato
      nell'angolo in basso a sinistra (dov'è il pulsante burger) e cresce
@@ -125,7 +130,7 @@
 .menu-overlay__inner {
   width: 100%;
   max-width: var(--container);
-  margin-inline: auto;
+  margin: auto;
 }
 
 .menu-overlay__label {
@@ -134,7 +139,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4);
 }
 
 .menu-overlay__links {
@@ -144,11 +149,11 @@
 .menu-overlay__links a {
   display: flex;
   align-items: baseline;
-  gap: var(--space-5);
-  padding: var(--space-3) 0;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
   border-bottom: 1px solid rgba(242, 241, 236, 0.16);
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 0.95rem + 2.1vw, 2.35rem);
+  font-size: clamp(1.2rem, 0.9rem + 1.6vw, 2rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--bg);
@@ -168,7 +173,7 @@
 }
 
 .menu-overlay__footer {
-  margin-top: var(--space-8);
+  margin-top: var(--space-6);
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -186,6 +191,33 @@
 .menu-overlay__socials {
   display: flex;
   gap: var(--space-4);
+}
+
+/* Con 7 voci il menu è vincolato dall'altezza della finestra, non dalla
+   larghezza: su finestre basse (o non a schermo intero) testo e spazi si
+   stringono progressivamente. */
+@media (max-height: 820px) {
+  .menu-overlay {
+    padding-block: var(--space-5);
+  }
+  .menu-overlay__links a {
+    font-size: clamp(1.05rem, 0.85rem + 1.1vw, 1.6rem);
+  }
+  .menu-overlay__label {
+    margin-bottom: var(--space-3);
+  }
+  .menu-overlay__footer {
+    margin-top: var(--space-5);
+  }
+}
+@media (max-height: 640px) {
+  .menu-overlay__links a {
+    font-size: 1rem;
+    padding: 0.3rem 0;
+  }
+  .menu-overlay__footer {
+    margin-top: var(--space-4);
+  }
 }
 
 /* Mentre l'overlay è aperto, gli elementi fissi dietro non devono essere

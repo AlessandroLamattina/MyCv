@@ -112,12 +112,12 @@ main {
 }
 
 section {
-  padding-block: var(--space-9);
+  padding-block: var(--space-8);
 }
 
 .section-head {
   max-width: 640px;
-  margin-bottom: var(--space-7);
+  margin-bottom: var(--space-6);
   padding-top: var(--space-4);
   border-top: 1px solid var(--hairline-strong);
 }
@@ -219,6 +219,6 @@ section {
 
 @media (max-width: 720px) {
   section {
-    padding-block: var(--space-7);
+    padding-block: var(--space-6);
   }
 }
