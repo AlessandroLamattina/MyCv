@@ -256,19 +256,25 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Render + comportamento: carosello esperienze (home)                 */
+  /* Render + comportamento: galleria circolare esperienze (home)         */
+  /* Le card sono disposte su un anello in 3D (CSS transform puro, nessuna
+     libreria): la card frontale è quella leggibile/attiva, le altre
+     ruotano intorno sfumando in opacità/sfocatura. Si ruota trascinando
+     (mouse o touch via Pointer Events), con le frecce o da tastiera.    */
   /* ------------------------------------------------------------------ */
   function renderExperiences(data) {
-    const track = document.getElementById("exp-track");
+    const stage = document.getElementById("exp-stage");
+    const ring = document.getElementById("exp-ring");
     const carousel = document.getElementById("exp-carousel");
-    if (!track || !carousel) return;
+    if (!stage || !ring || !carousel) return;
 
     const experiences = data.experiences;
+    const count = experiences.length;
 
-    track.innerHTML = experiences
+    stage.innerHTML = experiences
       .map(
         (exp) => `
-      <article class="glass-card exp-card reveal${exp.current ? " exp-card--current" : ""}">
+      <article class="glass-card exp-card${exp.current ? " exp-card--current" : ""}">
         <div class="exp-card__head">
           <h3>${exp.title}</h3>
           <span class="exp-card__period">${exp.period}</span>
@@ -286,106 +292,152 @@
       )
       .join("");
 
+    const cards = Array.from(stage.children);
+    if (!cards.length) return;
+
     const prevBtn = carousel.querySelector("[data-exp-prev]");
     const nextBtn = carousel.querySelector("[data-exp-next]");
     const counterCurrent = carousel.querySelector("[data-exp-current]");
     const counterTotal = carousel.querySelector("[data-exp-total]");
     const dotsRoot = carousel.querySelector("[data-exp-dots]");
-    const cards = Array.from(track.children);
 
-    if (counterTotal) counterTotal.textContent = String(experiences.length).padStart(2, "0");
-
+    if (counterTotal) counterTotal.textContent = String(count).padStart(2, "0");
     if (dotsRoot) {
       dotsRoot.innerHTML = cards
         .map((_, i) => `<button aria-label="Vai all'esperienza ${i + 1}" data-go="${i}"></button>`)
         .join("");
     }
 
-    function cardStep() {
-      const first = cards[0];
-      const second = cards[1];
-      if (!first) return 0;
-      const style = getComputedStyle(track);
-      const gap = parseFloat(style.columnGap || style.gap || "0") || 0;
-      return first.getBoundingClientRect().width + gap;
+    const angleStep = 360 / count;
+    let radius = 0;
+    let currentIndex = 0;
+    let rotation = 0; // gradi correnti dell'anello (negativo di currentIndex*angleStep a riposo)
+    let dragging = false;
+    let axisLocked = null; // 'x' | 'y' — quale gesto ha "vinto" durante il trascinamento
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragStartRotation = 0;
+
+    function computeRadius() {
+      const cardWidth = cards[0].getBoundingClientRect().width || 300;
+      if (count <= 2) {
+        radius = cardWidth * 0.75;
+        return;
+      }
+      const denom = Math.tan(Math.PI / count);
+      radius = denom > 0.0001 ? cardWidth / 2 / denom : cardWidth * 0.75;
     }
 
-    function closestIndex() {
-      const trackRect = track.getBoundingClientRect();
-      let best = 0;
-      let bestDist = Infinity;
+    function normalizeAngleDiff(deg) {
+      let d = deg % 360;
+      if (d > 180) d -= 360;
+      if (d < -180) d += 360;
+      return d;
+    }
+
+    function layout(animated) {
+      stage.style.transition =
+        animated && !prefersReducedMotion ? "transform 0.6s var(--ease-out)" : "none";
+      stage.style.transform = `rotateY(${rotation}deg)`;
+
       cards.forEach((card, i) => {
-        const dist = Math.abs(card.getBoundingClientRect().left - trackRect.left);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
+        const cardAngle = i * angleStep;
+        card.style.transform = `translate(-50%, -50%) rotateY(${cardAngle}deg) translateZ(${radius}px)`;
+        const diff = Math.abs(normalizeAngleDiff(cardAngle + rotation));
+        const isFront = diff < angleStep / 2 + 0.5;
+        const opacity = diff < 1 ? 1 : Math.max(0.12, 1 - diff / 130);
+        const blur = diff < 20 ? 0 : Math.min(5, (diff - 20) / 30);
+        card.style.opacity = String(opacity);
+        card.style.filter = blur ? `blur(${blur}px)` : "none";
+        card.style.pointerEvents = isFront ? "auto" : "none";
+        card.classList.toggle("exp-card--front", isFront);
+        card.setAttribute("aria-hidden", isFront ? "false" : "true");
       });
-      return best;
     }
 
     function updateUI() {
-      const idx = closestIndex();
-      if (counterCurrent) counterCurrent.textContent = String(idx + 1).padStart(2, "0");
-      if (prevBtn) prevBtn.disabled = track.scrollLeft <= 4;
-      if (nextBtn) nextBtn.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 4;
+      if (counterCurrent) counterCurrent.textContent = String(currentIndex + 1).padStart(2, "0");
       if (dotsRoot) {
         Array.from(dotsRoot.children).forEach((dot, i) => {
-          dot.setAttribute("aria-current", i === idx ? "true" : "false");
+          dot.setAttribute("aria-current", i === currentIndex ? "true" : "false");
         });
       }
     }
 
-    let scrollTicking = false;
-    track.addEventListener(
-      "scroll",
-      () => {
-        if (!scrollTicking) {
-          requestAnimationFrame(() => {
-            updateUI();
-            scrollTicking = false;
-          });
-          scrollTicking = true;
-        }
-      },
-      { passive: true }
-    );
+    function goTo(index, animated) {
+      currentIndex = ((index % count) + count) % count;
+      rotation = -currentIndex * angleStep;
+      layout(animated !== false);
+      updateUI();
+    }
 
-    if (prevBtn) {
-      prevBtn.addEventListener("click", () => {
-        track.scrollBy({ left: -cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
-        track.scrollBy({ left: cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
-      });
-    }
+    if (prevBtn) prevBtn.addEventListener("click", () => goTo(currentIndex - 1, true));
+    if (nextBtn) nextBtn.addEventListener("click", () => goTo(currentIndex + 1, true));
     if (dotsRoot) {
       dotsRoot.addEventListener("click", (e) => {
         const btn = e.target.closest("[data-go]");
         if (!btn) return;
-        const i = Number(btn.dataset.go);
-        const target = cards[i];
-        if (target) {
-          track.scrollTo({ left: target.offsetLeft - track.offsetLeft, behavior: prefersReducedMotion ? "auto" : "smooth" });
-        }
+        goTo(Number(btn.dataset.go), true);
       });
     }
 
-    track.setAttribute("tabindex", "0");
-    track.addEventListener("keydown", (e) => {
+    // Trascinamento con Pointer Events: unifica mouse e touch. Il gesto
+    // resta "libero" (verticale = scroll di pagina, orizzontale = rotazione
+    // dell'anello) finché non supera una soglia minima di movimento.
+    stage.addEventListener("pointerdown", (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      dragging = true;
+      axisLocked = null;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragStartRotation = rotation;
+      stage.classList.add("is-dragging");
+      stage.setPointerCapture(e.pointerId);
+    });
+
+    stage.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      if (axisLocked === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+        axisLocked = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+      if (axisLocked !== "x") return;
+      e.preventDefault();
+      rotation = dragStartRotation + dx * 0.35;
+      layout(false);
+    });
+
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      stage.classList.remove("is-dragging");
+      if (axisLocked === "x") {
+        goTo(Math.round(-rotation / angleStep), true);
+      }
+      axisLocked = null;
+    }
+    stage.addEventListener("pointerup", endDrag);
+    stage.addEventListener("pointercancel", endDrag);
+
+    stage.setAttribute("tabindex", "0");
+    stage.addEventListener("keydown", (e) => {
       if (e.key === "ArrowRight") {
         e.preventDefault();
-        track.scrollBy({ left: cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
+        goTo(currentIndex + 1, true);
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        track.scrollBy({ left: -cardStep(), behavior: prefersReducedMotion ? "auto" : "smooth" });
+        goTo(currentIndex - 1, true);
       }
     });
 
-    window.addEventListener("resize", updateUI);
-    updateUI();
+    window.addEventListener("resize", () => {
+      computeRadius();
+      layout(false);
+    });
+
+    computeRadius();
+    goTo(0, false);
   }
 
   /* ------------------------------------------------------------------ */

@@ -550,22 +550,43 @@ body.menu-open .back-to-top {
 }
 .exp-carousel__btn svg { width: 18px; height: 18px; }
 
-.exp-track {
-  display: flex;
-  gap: var(--space-5);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: var(--space-4);
-  scrollbar-width: none;
+.exp-ring {
+  position: relative;
+  height: 500px;
+  margin-bottom: var(--space-5);
+  perspective: 1600px;
 }
-.exp-track::-webkit-scrollbar { display: none; }
+
+.exp-ring__stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.exp-ring__stage.is-dragging {
+  cursor: grabbing;
+}
+.exp-ring__stage:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 8px;
+}
 
 .exp-card {
-  scroll-snap-align: start;
-  flex: 0 0 min(600px, 86vw);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(460px, 82vw);
+  max-height: 430px;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  overflow: hidden;
+  backface-visibility: hidden;
+  transition: opacity 0.3s var(--ease-out), filter 0.3s var(--ease-out);
+}
+.exp-card--front {
+  z-index: 1;
 }
 
 .exp-card__head {
@@ -603,6 +624,10 @@ body.menu-open .back-to-top {
 .exp-card__tasks {
   display: grid;
   gap: var(--space-2);
+  overflow-y: auto;
+  max-height: 148px;
+  padding-right: var(--space-2);
+  scrollbar-width: thin;
 }
 .exp-card__tasks li {
   position: relative;
@@ -651,7 +676,15 @@ body.menu-open .back-to-top {
 }
 
 @media (max-width: 600px) {
-  .exp-carousel__controls { display: none; }
+  .exp-ring {
+    height: 400px;
+  }
+  .exp-card {
+    max-height: 360px;
+  }
+  .exp-card__tasks {
+    max-height: 110px;
+  }
 }
 
 /* ==========================================================================
