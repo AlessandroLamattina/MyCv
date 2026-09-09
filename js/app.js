@@ -341,8 +341,10 @@
     }
 
     function layout(animated) {
-      stage.style.transition =
-        animated && !prefersReducedMotion ? "transform 0.6s var(--ease-out)" : "none";
+      // La transizione vive nel CSS (.exp-ring__stage): qui si toggla solo
+      // lo stato "senza animazione", usato al primo posizionamento e
+      // durante il trascinamento.
+      stage.classList.toggle("no-anim", !animated);
       stage.style.transform = `rotateY(${rotation}deg)`;
 
       cards.forEach((card, i) => {

@@ -522,9 +522,34 @@ body.menu-open .back-to-top {
   transform-style: preserve-3d;
   cursor: grab;
   touch-action: pan-y;
+  transition: transform 0.6s var(--ease-out);
+}
+/* Durante il trascinamento l'anello deve seguire il dito senza ritardo,
+   e al primo posizionamento non deve animare da zero. */
+.exp-ring__stage.is-dragging,
+.exp-ring__stage.no-anim {
+  transition: none;
 }
 .exp-ring__stage.is-dragging {
   cursor: grabbing;
+}
+
+/* Eccezione voluta a "riduci animazioni": la rotazione dell'anello non è
+   un effetto decorativo, è il segnale che indica il cambio di scheda —
+   senza, la scheda cambierebbe di scatto senza farlo capire. Serve
+   !important con un selettore più specifico per battere la regola
+   globale su * in base.css. */
+@media (prefers-reduced-motion: reduce) {
+  .exp-ring__stage {
+    transition-duration: 0.6s !important;
+  }
+  .exp-ring__stage.is-dragging,
+  .exp-ring__stage.no-anim {
+    transition-duration: 0s !important;
+  }
+  .exp-card {
+    transition-duration: 0.3s !important;
+  }
 }
 .exp-ring__stage:focus-visible {
   outline: 2px solid var(--accent);
